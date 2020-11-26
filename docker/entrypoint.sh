@@ -22,6 +22,19 @@ fi
 rm -f /var/run/cron*
 cron
 
+cp /var/templates/seeddms/conf/settings.xml /var/www/seeddms*/conf/settings.xml 
+params="$(env | grep -io "SET_configuration_")"
+for param in $params; do
+	xpath="$( echo "$param" | grep -io "SET_configuration_[^=]*" | sed 's/SET_//g' | sed 's|__|/@|g' | sed 's|_|/|g' )"
+	value="$( echo "$param" | grep -io "=.*" | sed 's/^=//g')"
+	xml ed -L -u "$xpath" -v "$value" /var/www/seeddms*/conf/settings.xml
+done
+
+params="$(env | grep -io "DELETE_configuration_")"
+for param in $params; do
+	xpath="$( echo "$param" | grep -io "DELETE_configuration_[^=]*" | sed 's/SET_//g' | sed 's|__|/@|g' | sed 's|_|/|g' )"
+	xml ed -L -d "$xpath"  /var/www/seeddms*/conf/settings.xml
+done
 . /usr/local/bin/docker-php-entrypoint
 
 

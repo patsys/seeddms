@@ -55,7 +55,7 @@ rm -rf seeddms*
 
 ADD configs/php.ini /usr/local/etc/php/
 ADD configs/000-default.conf /etc/apache2/sites-available/
-ADD configs/settings.xml /var/www/seeddms/template/conf/settings.xml
+ADD configs/settings.xml /var/templates/seeddms/template/conf/settings.xml
 ADD entrypoint.sh /opt/entrypoint
 
 RUN chown -R www-data:www-data /var/www/seeddms*/
