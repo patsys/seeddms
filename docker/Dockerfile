@@ -60,6 +60,6 @@ ADD entrypoint.sh /opt/entrypoint
 
 RUN chown -R www-data:www-data /var/www/seeddms*/
 
-RUN touch /var/www/seeddms/conf/ENABLE_INSTALL_TOOL
+RUN touch /var/www/seeddms*/conf/ENABLE_INSTALL_TOOL
 ENTRYPOINT ["/opt/entrypoint"]
 CMD ["apache2-foreground"]
