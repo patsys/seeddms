@@ -19,6 +19,7 @@ RUN rm /etc/apt/preferences.d/no-debian-php && \
     php-pear \
     poppler-utils \
     catdoc \
+    cron \
     curl \
     xmlstarlet \
     php-json \
@@ -51,15 +52,16 @@ pear -v 1 install SeedDMS_Core-$SEEDDMS_VERSION.tgz  && \
 pear -v 1 install seedDMS_Lucene-$LUCENE_VERSION.tgz  && \
 pear -v 1 install SeedDMS_Preview-$PREVIEW_VERSION.tgz && \
 pear -v 1 install Log && pear channel-discover pear.dotkernel.com/zf1/svn && pear install zend/zend && pear install HTTP_WebDAV_Server-1.0.0RC8 && \
-rm -rf seeddms*
+mkdir -p /var/templates/seeddms/conf/ && cp seeddms*/conf/settings.xml /var/templates/seeddms/conf/settings.xml && \
+rm *.tgz *.tar.gz
 
 ADD configs/php.ini /usr/local/etc/php/
 ADD configs/000-default.conf /etc/apache2/sites-available/
-ADD configs/settings.xml /var/templates/seeddms/template/conf/settings.xml
 ADD entrypoint.sh /opt/entrypoint
+ADD scripts/ /opt/seeddms/scripts
 
-RUN chown -R www-data:www-data /var/www/seeddms*/
+RUN mkdir -p /var/www/seeddms &&  mv /var/www/html/*/* /var/www/seeddms && mkdir -p /var/www/seeddms/data/{cache,staging,lucene,content,backup,drop} && chown -R www-data:www-data /var/www/seeddms 
 
-RUN touch /var/www/seeddms*/conf/ENABLE_INSTALL_TOOL
+RUN /opt/seeddms/scripts/static_change_config.sh
+expose 80
 ENTRYPOINT ["/opt/entrypoint"]
-CMD ["apache2-foreground"]
