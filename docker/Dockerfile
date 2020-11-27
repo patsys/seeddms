@@ -60,7 +60,7 @@ ADD configs/000-default.conf /etc/apache2/sites-available/
 ADD entrypoint.sh /opt/entrypoint
 ADD scripts/ /opt/seeddms/scripts
 
-RUN mkdir -p /var/www/seeddms &&  mv /var/www/html/*/* /var/www/seeddms && mkdir -p /var/www/seeddms/data/{cache,staging,lucene,content,backup,drop} && chown -R www-data:www-data /var/www/seeddms 
+RUN mkdir -p /var/www/seeddms &&  mv /var/www/html/*/* /var/www/seeddms && mkdir -p /var/www/seeddms/store/{cache staging lucene content backup drop} && chown -R www-data:www-data /var/www/seeddms 
 
 RUN /opt/seeddms/scripts/static_change_config.sh
 expose 80
