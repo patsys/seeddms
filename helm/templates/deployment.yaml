@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "seeddms.fullname" . }}
+  labels:
+    {{- include "seeddms.labels" . | nindent 4 }}
+spec:
+  serviceName: {{ include "seeddms.fullname" . }}
+{{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+{{- end }}
+  selector:
+    matchLabels:
+      {{- include "seeddms.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+    {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      labels:
+        {{- include "seeddms.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "seeddms.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          env:
+            {{- toYaml .Values.seeddms.envs | nindent 12 }}
+          {{- if ne .Values.database.type "sqlite" }}
+            SET_configuriation_system_database__dbuUser: {{ .Values.database.user }}
+            SET_configuriation_system_database__dbPassword: {{ .Values.database.password }}
+            SET_configuriation_system_database__dbHostname: {{ .Values.database.hostname }}
+            SET_configuriation_system_database__dbDatabase: {{ .Values.database.database }}
+            SET_configuriation_system_database__dbDriver: {{ .Values.database.type }}
+            {{- if .Values.database.external}}
+            {{- else }}
+            {{- end }}
+          {{- end }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          volumeMounts:
+          - name: {{ include "seeddms.fullname" . }}-data
+            mountPath: /var/www/seeddms/data
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+  volumeClaimTemplates:
+  - metadata:
+      name: {{ include "seeddms.fullname" . }}-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: {{ .Values.seeddms.storage.size | default "10Gi" }}
