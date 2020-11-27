@@ -5,7 +5,7 @@ xmlstarlet ed -L -u "/configuration/system/server/@httpRoot" -v "/" /var/templat
 xmlstarlet ed -L -u "/configuration/system/server/@contentDir" -v "/var/www/seeddms/store/content/" /var/templates/seeddms/conf/settings.xml
 xmlstarlet ed -L -u "/configuration/system/server/@stagingDir" -v "/var/www/seeddms/store/staging/" /var/templates/seeddms/conf/settings.xml
 xmlstarlet ed -L -u "/configuration/system/server/@backupDir" -v "/var/www/seeddms/store/backup/" /var/templates/seeddms/conf/settings.xml
-xmlstarlet ed -L -u "/configuration/system/server/@cacheDir" -v "/var/www/seeddms/store/cache/" /var/templates/seeddms/conf/settings.xml
+xmlstarlet ed -L -u "/configuration/system/server/@cacheDir" -v "/var/www/seeddms/data/cache" /var/templates/seeddms/conf/settings.xml
 xmlstarlet ed -L -u "/configuration/system/server/@dropFolderDir" -v "/var/www/seeddms/store/drop/" /var/templates/seeddms/conf/settings.xml
 xmlstarlet ed -L -u "/configuration/system/server/@luceneDir" -v "/var/www/seeddms/store/lucene/" /var/templates/seeddms/conf/settings.xml
 xmlstarlet ed -L -u "/configuration/system/database/@dbDriver" -v "sqlite" /var/templates/seeddms/conf/settings.xml
@@ -14,4 +14,3 @@ xmlstarlet ed -L -u "/configuration/system/database/@dbDatabase" -v "/var/www/se
 xmlstarlet ed -L -u "/configuration/system/database/@dbUesr" -v "seeddms" /var/templates/seeddms/conf/settings.xml
 xmlstarlet ed -L -u "/configuration/system/database/@dbPassword" -v "seeddms" /var/templates/seeddms/conf/settings.xml
 xmlstarlet ed -L -u "/configuration/system/database/@doNotCheckVersion" -v "false" /var/templates/seeddms/conf/settings.xml
-

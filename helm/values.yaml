@@ -19,7 +19,7 @@ image:
   repository: patsys/seeddms
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+  tag: "1.0.4"
 
 imagePullSecrets: []
 nameOverride: ""

@@ -45,6 +45,10 @@ for file in /var/seeeddms/hooks/*; do
   fi
 done
 
+mkdir -p /var/www/seeddms/store/{staging lucene content backup drop}
+if [ ! -f /var/www/seeddms/store/content.db ]; then
+  cp /var/www/seeddms/data/content.db /var/www/seeddms/store/content.db
+fi
 chown -R www-data:www-data /var/www/seeddms
 
 apachectl -D FOREGROUND
