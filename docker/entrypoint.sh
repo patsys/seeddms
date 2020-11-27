@@ -44,6 +44,7 @@ for file in /var/seeeddms/hooks/*; do
     $file
   fi
 done
+
 chown -R www-data:www-data /var/www/seeddms
 
 apachectl -D FOREGROUND
