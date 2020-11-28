@@ -11,12 +11,15 @@ metadata:
   name: {{ $fullName }}
   labels:
     {{- include "seeddms.labels" . | nindent 4 }}
-  {{- with .Values.ingress.annotations }}
   annotations:
+  {{- if .Values.ingress.letsencrypt.enable }}
+    certmanager.k8s.io/cluster-issuer: {{ include "seeddms.fullname" . }}-letsencrypt
+  {{- end }}
+  {{- with .Values.ingress.annotations }}
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  {{- if .Values.ingress.tls }}
+  {{- if .Values.ingress.tls or .Values.ingress.letsencrypt }}
   tls:
     {{- range .Values.ingress.tls }}
     - hosts:
@@ -24,6 +27,13 @@ spec:
         - {{ . | quote }}
         {{- end }}
       secretName: {{ .secretName }}
+    {{- end }}
+    {{- range .Values.ingress.letsencrypt.hosts }}
+    - hosts:
+        {{- range . }}
+        - {{ . | quote }}
+        {{- end }}
+      secretName: {{ include "seeddms.fullname" . }}-letsencrypt-crt
     {{- end }}
   {{- end }}
   rules:
