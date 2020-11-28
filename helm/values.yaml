@@ -52,20 +52,18 @@ service:
   port: 80
 
 ingress:
-  enable: true
+  enable: false
   annotations: {
     nginx.ingress.kubernetes.io/proxy-body-size: 50m
   }
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
-  hosts:
-    - host: dms.web.potcloud.de
-      paths: ["/"]
+  hosts: []
   letsencrypt:
-    enable: true
-    email: "letsencrypt@patweber.de"
-    hosts: ["dms.web.potcloud.de"]
-    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    enable: false
+    email: ""
+    hosts: []
+    server: ""
   tls: []
   #  - secretName: chart-example-tls
   #    hosts:
