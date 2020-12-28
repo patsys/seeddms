@@ -52,7 +52,7 @@ service:
   port: 80
 
 ingress:
-  enable: false
+  enabled: false
   annotations: {
     nginx.ingress.kubernetes.io/proxy-body-size: 50m
   }
@@ -60,10 +60,12 @@ ingress:
     # kubernetes.io/tls-acme: "true"
   hosts: []
   letsencrypt:
-    enable: false
+    enabled: false
     email: ""
     hosts: []
     server: ""
+    dns01: {} 
+
   tls: []
   #  - secretName: chart-example-tls
   #    hosts:

@@ -29,40 +29,47 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ .Chart.Name }}
-          env:
-            {{- toYaml .Values.seeddms.envs | nindent 12 }}
-          {{- if ne .Values.database.type "sqlite" }}
-            SET_configuriation_system_database__dbuUser: {{ .Values.database.user }}
-            SET_configuriation_system_database__dbPassword: {{ .Values.database.password }}
-            SET_configuriation_system_database__dbHostname: {{ .Values.database.hostname }}
-            SET_configuriation_system_database__dbDatabase: {{ .Values.database.database }}
-            SET_configuriation_system_database__dbDriver: {{ .Values.database.type }}
-            {{- if .Values.database.external}}
-            {{- else }}
-            {{- end }}
+      - name: {{ .Chart.Name }}
+        env:
+        {{- if .Values.seeddms.envs }}
+          {{- toYaml .Values.seeddms.envs | nindent 10 }}
+        {{- end }}
+        {{- if ne .Values.database.type "sqlite" }}
+        - name: SET_configuriation_system_database__dbuUser 
+          value: {{ .Values.database.user }}
+        - name: SET_configuriation_system_database__dbPassword 
+          value: {{ .Values.database.password }}
+        - name: SET_configuriation_system_database__dbHostname 
+          value: {{ .Values.database.hostname }}
+        - name: SET_configuriation_system_database__dbDatabase 
+          value: {{ .Values.database.database }}
+        - name: SET_configuriation_system_database__dbDriver
+          value: {{ .Values.database.type }}
+          {{- if .Values.database.external}}
+          {{- else }}
           {{- end }}
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          volumeMounts:
-          - name: {{ include "seeddms.fullname" . }}-data
-            mountPath: /var/www/seeddms/store
-          ports:
-            - name: http
-              containerPort: 80
-              protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
-          readinessProbe:
-            httpGet:
-              path: /
-              port: http
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+        {{- end }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        volumeMounts:
+        - name: {{ include "seeddms.fullname" . }}-data
+          mountPath: /var/www/seeddms/store
+        ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /
+            port: http
+        readinessProbe:
+          httpGet:
+            path: /
+            port: http
+        resources:
+          {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
