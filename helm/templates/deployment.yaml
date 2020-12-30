@@ -1,3 +1,20 @@
+{{- if not .Values.seeddms.admin.password }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .Values.seeddms.admin.secret.password.ref.name | default ( printf "%s-admin-pass" ( include "seeddms.fullname" . ) ) }}
+  namespace: {{ .Release.Namespace }}
+type: kubernetes.io/opaque
+data:
+  {{- $cert_pass := lookup "v1" "Secret" .Release.Namespace ( .Values.seeddms.admin.secret.password.ref.name | default ( printf "%s-admin-pass" ( include "seeddms.fullname" . ) )) }}
+  {{- if $cert_pass  }} 
+  {{ .Values.seeddms.admin.secret.password.ref.key | default "pass" }}: {{ index $cert_pass.data (.Values.seeddms.admin.secret.password.ref.key | default "pass") }} 
+  {{- else}}
+  {{ .Values.seeddms.admin.secret.password.ref.key | default "pass" }}: {{ .Values.seeddms.admin.secret.password.password | default ( randAscii 16 ) | replace "'" "''" | b64enc | quote  }}
+  {{- end }}
+{{- end }}
+---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -31,19 +48,28 @@ spec:
       containers:
       - name: {{ .Chart.Name }}
         env:
-        {{- if .Values.seeddms.envs }}
+        - name: ADMIN_INITIAL_PASSWORD
+        {{- if .Values.seeddms.admin.password  }}
+          value: {{ .Values.seeddms.admin.password }}
+        {{- else }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.seeddms.admin.secret.password.ref.name | default ( printf "%s-admin-pass" ( include "seeddms.fullname" . ) ) }}
+              key: {{ .Values.seeddms.admin.secret.password.ref.key | default "pass" }}
+        {{- end }}
+ {{- if .Values.seeddms.envs }}
           {{- toYaml .Values.seeddms.envs | nindent 10 }}
         {{- end }}
         {{- if ne .Values.database.type "sqlite" }}
-        - name: SET_configuriation_system_database__dbuUser 
+        - name: SET_configuration_system_database__dbuUser 
           value: {{ .Values.database.user }}
-        - name: SET_configuriation_system_database__dbPassword 
+        - name: SET_configuration_system_database__dbPass 
           value: {{ .Values.database.password }}
-        - name: SET_configuriation_system_database__dbHostname 
+        - name: SET_configuration_system_database__dbHostname 
           value: {{ .Values.database.hostname }}
-        - name: SET_configuriation_system_database__dbDatabase 
+        - name: SET_configuration_system_database__dbDatabase 
           value: {{ .Values.database.database }}
-        - name: SET_configuriation_system_database__dbDriver
+        - name: SET_configuration_system_database__dbDriver
           value: {{ .Values.database.type }}
           {{- if .Values.database.external}}
           {{- else }}

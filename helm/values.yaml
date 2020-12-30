@@ -11,6 +11,18 @@ database:
   exernal: false
 
 seeddms:
+  # admin init password
+  admin:
+    # use secret for password generate not exist
+    secret:
+      password:
+        ref:
+          name: ""
+          key: ""
+        # use as password in secret not set then password will generate
+        password: ""
+    # if set use this and not use secret
+    password: ""
   storage:
     size: ""
 replicaCount: 1
@@ -19,7 +31,7 @@ image:
   repository: patsys/seeddms
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "1.0.4"
+  tag: ""
 
 imagePullSecrets: []
 nameOverride: ""
